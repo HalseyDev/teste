@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Don Carlo · Painel Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold-l:#E8C97A;--gold-pale:rgba(201,168,76,.1);
+  --bg:#0D0D0D;--surface:#141414;--card:#1C1C1C;--card2:#222;
+  --border:#282828;--border2:#333;
+  --text:#F0EBE1;--text2:#999;--text3:#555;
+  --green:#4CAF50;--green-bg:rgba(76,175,80,.12);--green-text:#6FCF97;
+  --red:#E24B4A;--red-bg:rgba(226,75,74,.1);--red-text:#F87171;
+  --blue:#4A90E2;--blue-bg:rgba(74,144,226,.1);--blue-text:#6AABFF;
+  --amber:#F0A500;--amber-bg:rgba(240,165,0,.1);--amber-text:#FFC948;
+  --sidebar:240px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── LOGIN ── */
+#login-page{
+  display:flex;align-items:center;justify-content:center;
+  height:100vh;background:var(--bg);
+  background-image:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,.06) 0%,transparent 60%),
+                   radial-gradient(ellipse at 80% 20%,rgba(201,168,76,.04) 0%,transparent 50%);
+}
+.login-box{
+  width:380px;padding:40px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:24px;
+  box-shadow:0 40px 80px rgba(0,0,0,.5);
+}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo-icon{font-size:44px;display:block;margin-bottom:10px}
+.login-logo-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700}
+.login-logo-title span{color:var(--gold)}
+.login-logo-sub{font-size:12px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.login-label{font-size:11px;color:var(--text2);letter-spacing:.5px;margin-bottom:6px;display:block}
+.login-input{
+  width:100%;background:var(--card);border:1px solid var(--border2);
+  border-radius:12px;padding:13px 14px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:14px;outline:none;
+  transition:border-color .2s;margin-bottom:14px;
+}
+.login-input:focus{border-color:var(--gold)}
+.login-input::placeholder{color:var(--text3)}
+.login-btn{
+  width:100%;padding:15px;background:var(--gold);border:none;border-radius:12px;
+  color:#0d0d0d;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;
+  cursor:pointer;transition:all .2s;margin-top:4px;
+}
+.login-btn:hover{background:var(--gold-l);transform:translateY(-1px)}
+.login-btn:active{transform:scale(.98)}
+.login-hint{font-size:12px;color:var(--text3);text-align:center;margin-top:16px}
+.login-error{
+  background:var(--red-bg);border:1px solid rgba(226,75,74,.25);color:var(--red-text);
+  padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none;
+}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;position:relative;overflow:hidden;
+}
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.3),transparent);
+}
+.sidebar-brand{
+  padding:24px 20px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.brand-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--gold-pale);border:1px solid rgba(201,168,76,.3);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.brand-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--gold)}
+.brand-role{font-size:10px;color:var(--text2);letter-spacing:.5px}
+
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-section-label{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);
+  padding:10px 10px 6px;
+}
+.nav-link{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:10px;cursor:pointer;transition:all .18s;color:var(--text2);
+  margin-bottom:2px;font-size:13px;position:relative;
+}
+.nav-link:hover{background:var(--card);color:var(--text)}
+.nav-link.active{background:var(--gold-pale);color:var(--gold);border:1px solid rgba(201,168,76,.15)}
+.nav-link.active .nav-icon{filter:none}
+.nav-icon{font-size:17px;width:20px;text-align:center;flex-shrink:0}
+.nav-badge{
+  margin-left:auto;background:var(--red);color:#fff;
+  font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;min-width:20px;text-align:center;
+}
+
+.sidebar-footer{
+  padding:16px;border-top:1px solid var(--border);
+}
+.sidebar-user{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  background:var(--card);border-radius:12px;cursor:pointer;transition:.15s;
+}
+.sidebar-user:hover{background:var(--card2)}
+.user-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#8B6914);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#0d0d0d;flex-shrink:0;
+}
+.user-name{font-size:13px;font-weight:500;line-height:1.3}
+.user-sub{font-size:11px;color:var(--text2)}
+.logout-btn{margin-left:auto;font-size:16px;color:var(--text3);transition:.15s}
+.sidebar-user:hover .logout-btn{color:var(--red-text)}
+
+/* ── MAIN AREA ── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg)}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;border-bottom:1px solid var(--border);
+  background:var(--bg);position:sticky;top:0;z-index:10;flex-shrink:0;
+}
+.topbar-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-date{font-size:13px;color:var(--text2)}
+.topbar-notif{
+  width:36px;height:36px;background:var(--card);border:1px solid var(--border2);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:17px;cursor:pointer;transition:.15s;position:relative;
+}
+.topbar-notif:hover{border-color:var(--gold)}
+.notif-dot{
+  position:absolute;top:6px;right:6px;width:7px;height:7px;
+  background:var(--red);border-radius:50%;border:1.5px solid var(--bg);
+}
+
+/* ── PAGE ── */
+.page{display:none;padding:24px 28px;flex:1}
+.page.active{display:block}
+
+/* ── METRIC CARDS ── */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.metric-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s;
+}
+.metric-card:hover{border-color:var(--border2)}
+.metric-card::before{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:80px;height:80px;border-radius:50%;opacity:.15;
+}
+.metric-card.green::before{background:var(--green)}
+.metric-card.gold::before{background:var(--gold)}
+.metric-card.blue::before{background:var(--blue)}
+.metric-card.red::before{background:var(--red)}
+.metric-label{font-size:11px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.metric-value{font-size:26px;font-weight:500;line-height:1;margin-bottom:6px}
+.metric-value.gold{color:var(--gold)}
+.metric-sub{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.metric-sub.up{color:var(--green-text)}
+.metric-sub.down{color:var(--red-text)}
+.metric-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:.4}
+
+/* ── SECTION HEADERS ── */
+.section-hdr{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+}
+.section-hdr h2{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--gold)}
+.section-hdr-right{display:flex;align-items:center;gap:8px}
+.btn-sm{
+  padding:7px 14px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:.15s;font-weight:500;
+}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-primary{background:var(--gold);border:none;color:#0d0d0d}
+.btn-primary:hover{background:var(--gold-l)}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:12px 16px;text-align:left;font-size:11px;font-weight:500;
+  color:var(--text2);letter-spacing:.5px;text-transform:uppercase;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody td{padding:14px 16px;font-size:13px;vertical-align:middle}
+
+/* ── STATUS BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:500;padding:4px 10px;border-radius:8px;
+}
+.badge-confirmed{background:var(--green-bg);color:var(--green-text);border:1px solid rgba(76,175,80,.2)}
+.badge-pending{background:var(--amber-bg);color:var(--amber-text);border:1px solid rgba(240,165,0,.2)}
+.badge-cancelled{background:var(--red-bg);color:var(--red-text);border:1px solid rgba(226,75,74,.2)}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── ACTION BUTTONS ── */
+.action-btn{
+  width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);
+  background:transparent;cursor:pointer;font-size:14px;transition:.15s;
+  display:inline-flex;align-items:center;justify-content:center;color:var(--text2);
+}
+.action-btn:hover.confirm{border-color:var(--green);color:var(--green-text)}
+.action-btn:hover.cancel{border-color:var(--red);color:var(--red-text)}
+.action-btn:hover.view{border-color:var(--blue);color:var(--blue-text)}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-chip{
+  padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;
+  border:1px solid var(--border2);color:var(--text2);background:transparent;
+  font-family:'DM Sans',sans-serif;transition:.15s;
+}
+.filter-chip:hover{border-color:var(--border2);color:var(--text)}
+.filter-chip.active{background:var(--gold-pale);border-color:var(--gold);color:var(--gold)}
+.search-input{
+  background:var(--card);border:1px solid var(--border2);border-radius:10px;
+  padding:7px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
+  outline:none;transition:.15s;width:200px;
+}
+.search-input:focus{border-color:var(--gold)}
+.search-input::placeholder{color:var(--text3)}
+
+/* ── TWO COL LAYOUT ── */
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:20px}
+
+/* ── MINI CALENDAR ── */
+.mini-cal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px}
+.mini-cal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.mini-cal-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:600}
+.mini-cal-btn{
+  background:var(--card2);border:none;color:var(--text2);
+  width:26px;height:26px;border-radius:7px;cursor:pointer;font-size:14px;transition:.15s;
+}
+.mini-cal-btn:hover{color:var(--gold)}
+.mini-days-hdr{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px}
+.mini-dh{font-size:10px;color:var(--text3);text-transform:uppercase;padding:3px 0}
+.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:6px;font-size:11px;cursor:pointer;transition:.12s;color:var(--text2);
+}
+.mini-day:hover:not(.past):not(.empty){background:var(--card2);color:var(--text)}
+.mini-day.past{color:var(--text3);cursor:default}
+.mini-day.today{color:var(--gold);font-weight:600}
+.mini-day.has-appt{position:relative}
+.mini-day.has-appt::after{
+  content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+  width:3px;height:3px;border-radius:50%;background:var(--gold);
+}
+.mini-day.selected{background:var(--gold)!important;color:#0d0d0d!important;font-weight:700;border-radius:50%}
+
+/* ── TODAY'S SCHEDULE ── */
+.schedule-list{display:flex;flex-direction:column;gap:8px}
+.schedule-item{
+  background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;display:flex;align-items:center;gap:12px;transition:.15s;cursor:pointer;
+}
+.schedule-item:hover{border-color:var(--border2)}
+.schedule-item.confirmed-item{border-left:3px solid var(--green)}
+.schedule-item.pending-item{border-left:3px solid var(--amber)}
+.schedule-item.cancelled-item{border-left:3px solid var(--red);opacity:.6}
+.sch-time{font-size:13px;font-weight:500;color:var(--gold);min-width:44px}
+.sch-info{flex:1}
+.sch-client{font-size:13px;font-weight:500}
+.sch-service{font-size:11px;color:var(--text2);margin-top:1px}
+.sch-barber{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* ── BARBER CARDS ── */
+.barbers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.barber-admin-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:20px 16px;text-align:center;transition:border-color .2s;
+}
+.barber-admin-card:hover{border-color:var(--border2)}
+.ba-avatar{
+  width:58px;height:58px;border-radius:50%;margin:0 auto 12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;color:#0d0d0d;
+  position:relative;
+}
+.ba-avatar::after{
+  content:'';position:absolute;inset:-3px;border-radius:50%;
+  border:1.5px solid rgba(201,168,76,.3);
+}
+.ba-name{font-size:14px;font-weight:500;margin-bottom:2px}
+.ba-role{font-size:11px;color:var(--text2);margin-bottom:10px}
+.ba-stats{display:flex;justify-content:center;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ba-stat-num{font-size:15px;font-weight:500;color:var(--gold)}
+.ba-stat-lbl{font-size:10px;color:var(--text3)}
+.ba-status-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;
+}
+
+/* ── STATS CHART PLACEHOLDER ── */
+.chart-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:24px}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:16px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.bar{
+  width:100%;border-radius:6px 6px 0 0;background:var(--gold-pale);
+  border:1px solid rgba(201,168,76,.2);transition:background .2s;cursor:pointer;
+  position:relative;overflow:visible;
+}
+.bar:hover{background:rgba(201,168,76,.25)}
+.bar-label{font-size:10px;color:var(--text3)}
+.bar-val{font-size:11px;color:var(--gold);font-weight:500}
+
+/* ── MODAL ── */
+.modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:100;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:20px;
+  padding:28px;width:460px;max-width:90vw;
+  animation:modalIn .25s cubic-bezier(.34,1.2,.64,1);
+  max-height:90vh;overflow-y:auto;
+}
+@keyframes modalIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600}
+.modal-close{
+  background:var(--card2);border:1px solid var(--border2);color:var(--text2);
+  width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;transition:.15s;
+}
+.modal-close:hover{border-color:var(--red);color:var(--red-text)}
+.modal-detail-row{
+  display:flex;justify-content:space-between;padding:11px 0;
+  border-bottom:1px solid var(--border);font-size:13px;
+}
+.modal-detail-row:last-child{border-bottom:none}
+.modal-detail-label{color:var(--text2);display:flex;align-items:center;gap:8px}
+.modal-detail-value{color:var(--text);text-align:right;max-width:60%}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-btn{
+  flex:1;padding:12px;border-radius:12px;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:500;cursor:pointer;transition:.15s;
+}
+.modal-btn-confirm{background:var(--green-bg);border:1px solid rgba(76,175,80,.25);color:var(--green-text)}
+.modal-btn-confirm:hover{background:rgba(76,175,80,.2)}
+.modal-btn-cancel{background:var(--red-bg);border:1px solid rgba(226,75,74,.2);color:var(--red-text)}
+.modal-btn-cancel:hover{background:rgba(226,75,74,.18)}
+.modal-btn-close{background:var(--card2);border:1px solid var(--border2);color:var(--text2)}
+.modal-btn-close:hover{border-color:var(--border2);color:var(--text)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  background:var(--card2);border:1px solid var(--border2);color:var(--text);
+  padding:12px 18px;border-radius:12px;font-size:13px;
+  opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-color:rgba(76,175,80,.3);color:var(--green-text)}
+.toast.error{border-color:rgba(226,75,74,.3);color:var(--red-text)}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-state-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-state-text{font-size:13px;line-height:1.6}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr}
+  .barbers-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  :root{--sidebar:60px}
+  .brand-name,.brand-role,.nav-link span,.sidebar-user .user-name,.sidebar-user .user-sub{display:none}
+  .sidebar-brand{justify-content:center;padding:20px 10px}
+  .nav-link{justify-content:center;padding:10px}
+  .sidebar-footer{padding:10px}
+  .sidebar-user{justify-content:center}
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .topbar{padding:14px 16px}
+  .page{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="login-logo-icon">💈</span>
+      <div class="login-logo-title">Don <span>Carlo</span></div>
+      <div class="login-logo-sub">Painel Administrativo</div>
+    </div>
+    <div class="login-error" id="login-error">Senha incorreta. Tente novamente.</div>
+    <label class="login-label">Usuário</label>
+    <input class="login-input" type="text" id="login-user" value="admin" placeholder="admin">
+    <label class="login-label">Senha</label>
+    <input class="login-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Entrar no painel →</button>
+    <div class="login-hint">Senha padrão: <strong>carlo2024</strong></div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app">
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">💈</div>
+      <div>
+        <div class="brand-name">Don Carlo</div>
+        <div class="brand-role">Admin</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <div class="nav-link active" onclick="goPage('dashboard',this)">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </div>
+      <div class="nav-link" onclick="goPage('appointments',this)" id="nav-appts">
+        <span class="nav-icon">📋</span><span>Agendamentos</span>
+        <span class="nav-badge" id="pending-badge">3</span>
+      </div>
+      <div class="nav-link" onclick="goPage('calendar',this)">
+        <span class="nav-icon">📅</span><span>Agenda</span>
+      </div>
+      <div class="nav-section-label" style="margin-top:8px">Gestão</div>
+      <div class="nav-link" onclick="goPage('barbers',this)">
+        <span class="nav-icon">✂️</span><span>Barbeiros</span>
+      </div>
+      <div class="nav-link" onclick="goPage('services',this)">
+        <span class="nav-icon">💈</span><span>Serviços</span>
+      </div>
+      <div class="nav-link" onclick="goPage('reports',this)">
+        <span class="nav-icon">📈</span><span>Relatórios</span>
+      </div>
+      <div class="nav-section-label" style="margin-top:8px">Sistema</div>
+      <div class="nav-link" onclick="goPage('settings',this)">
+        <span class="nav-icon">⚙️</span><span>Configurações</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="logout()">
+        <div class="user-avatar">DC</div>
+        <div>
+          <div class="user-name">Don Carlo</div>
+          <div class="user-sub">Proprietário</div>
+        </div>
+        <div class="logout-btn">⏻</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date"></div>
+        <div class="topbar-notif" onclick="goPage('appointments',document.querySelector('.nav-link:nth-child(2)'))">
+          🔔<div class="notif-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="metrics-grid">
+        <div class="metric-card gold">
+          <div class="metric-icon">📅</div>
+          <div class="metric-label">Hoje</div>
+          <div class="metric-value gold" id="m-today">8</div>
+          <div class="metric-sub up">↑ 2 a mais que ontem</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-icon">💰</div>
+          <div class="metric-label">Faturamento Hoje</div>
+          <div class="metric-value" id="m-revenue">R$ 540</div>
+          <div class="metric-sub up">↑ 12% vs semana passada</div>
+        </div>
+        <div class="metric-card blue">
+          <div class="metric-icon">👥</div>
+          <div class="metric-label">Clientes este mês</div>
+          <div class="metric-value" id="m-clients">142</div>
+          <div class="metric-sub up">↑ 8 novos clientes</div>
+        </div>
+        <div class="metric-card red">
+          <div class="metric-icon">⏳</div>
+          <div class="metric-label">Pendentes</div>
+          <div class="metric-value" id="m-pending">3</div>
+          <div class="metric-sub down">Aguardando confirmação</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-bar-wrap">
+        <div class="section-hdr" style="margin-bottom:0">
+          <h2>Agendamentos — Últimos 7 dias</h2>
+          <div class="topbar-date" id="chart-range"></div>
+        </div>
+        <div class="chart-bars" id="chart-bars"></div>
+      </div>
+
+      <div class="two-col">
+        <!-- Today's appointments -->
+        <div>
+          <div class="section-hdr">
+            <h2>Agenda de Hoje</h2>
+            <button class="btn-sm btn-outline" onclick="goPage('appointments',document.querySelectorAll('.nav-link')[1])">Ver todos</button>
+          </div>
+          <div class="schedule-list" id="today-schedule"></div>
+        </div>
+        <!-- Mini calendar -->
+        <div>
+          <div class="section-hdr"><h2>Calendário</h2></div>
+          <div class="mini-cal">
+            <div class="mini-cal-hdr">
+              <button class="mini-cal-btn" onclick="miniMonth(-1)">‹</button>
+              <div class="mini-cal-title" id="mini-month-label"></div>
+              <button class="mini-cal-btn" onclick="miniMonth(1)">›</button>
+            </div>
+            <div class="mini-days-hdr">
+              <div class="mini-dh">D</div><div class="mini-dh">S</div><div class="mini-dh">T</div>
+              <div class="mini-dh">Q</div><div class="mini-dh">Q</div><div class="mini-dh">S</div>
+              <div class="mini-dh">S</div>
+            </div>
+            <div class="mini-grid" id="mini-grid"></div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="section-hdr"><h2>Barbeiros Hoje</h2></div>
+            <div style="display:flex;flex-direction:column;gap:8px" id="barbers-today"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ APPOINTMENTS ═══ -->
+    <div class="page" id="page-appointments">
+      <div class="filters">
+        <input class="search-input" type="text" placeholder="🔍 Buscar cliente..." oninput="filterAppts(this.value)" id="appt-search">
+        <button class="filter-chip active" onclick="filterStatus('all',this)">Todos</button>
+        <button class="filter-chip" onclick="filterStatus('confirmed',this)">Confirmados</button>
+        <button class="filter-chip" onclick="filterStatus('pending',this)">Pendentes</button>
+        <button class="filter-chip" onclick="filterStatus('cancelled',this)">Cancelados</button>
+        <button class="btn-sm btn-primary" onclick="openNewAppt()" style="margin-left:auto">+ Novo Agendamento</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th><th>Serviço</th><th>Barbeiro</th>
+              <th>Data</th><th>Horário</th><th>Valor</th><th>Status</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="appts-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text3)" id="appt-count"></div>
+    </div>
+
+    <!-- ═══ CALENDAR VIEW ═══ -->
+    <div class="page" id="page-calendar">
+      <div class="two-col">
+        <div>
+          <div class="section-hdr">
+            <h2 id="cal-month-title"></h2>
+            <div class="section-hdr-right">
+              <button class="btn-sm btn-outline" onclick="calMonth(-1)">‹ Anterior</button>
+              <button class="btn-sm btn-outline" onclick="calMonth(1)">Próximo ›</button>
+            </div>
+          </div>
+          <div class="table-wrap" style="padding:16px">
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:8px">
+              <div style="font-size:11px;color:var(--text3);padding:4px">Dom</div>
+              <div style="font-size:11px;color:var(--text3);padding:4px">Seg</div>
+              <div style="font-size:11px;color:var(--text3);padding:4px">Ter</div>
+              <div style="font-size:11px;color:var(--text3);padding:4px">Qua</div>
+              <div style="font-size:11px;color:var(--text3);padding:4px">Qui</div>
+              <div style="font-size:11px;color:var(--text3);padding:4px">Sex</div>
+              <div style="font-size:11px;color:var(--text3);padding:4px">Sáb</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px" id="cal-big-grid"></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-hdr"><h2 id="cal-day-title">Selecione um dia</h2></div>
+          <div id="cal-day-list"><div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">Clique em um dia para ver os agendamentos</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BARBERS ═══ -->
+    <div class="page" id="page-barbers">
+      <div class="section-hdr">
+        <h2>Equipe de Barbeiros</h2>
+        <button class="btn-sm btn-primary">+ Adicionar Barbeiro</button>
+      </div>
+      <div class="barbers-grid" id="barbers-grid"></div>
+    </div>
+
+    <!-- ═══ SERVICES ═══ -->
+    <div class="page" id="page-services">
+      <div class="section-hdr">
+        <h2>Serviços Oferecidos</h2>
+        <button class="btn-sm btn-primary">+ Novo Serviço</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Serviço</th><th>Duração</th><th>Preço</th><th>Agendamentos</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="services-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div class="page" id="page-reports">
+      <div class="metrics-grid">
+        <div class="metric-card gold"><div class="metric-icon">💰</div><div class="metric-label">Receita Total (mês)</div><div class="metric-value gold">R$ 8.420</div><div class="metric-sub up">↑ 18% vs mês anterior</div></div>
+        <div class="metric-card green"><div class="metric-icon">✂️</div><div class="metric-label">Cortes realizados</div><div class="metric-value">187</div><div class="metric-sub up">↑ 23 a mais</div></div>
+        <div class="metric-card blue"><div class="metric-icon">⭐</div><div class="metric-label">Avaliação média</div><div class="metric-value">4.9</div><div class="metric-sub up">de 5 estrelas</div></div>
+        <div class="metric-card red"><div class="metric-icon">❌</div><div class="metric-label">Taxa de cancelamento</div><div class="metric-value">4.2%</div><div class="metric-sub down">↑ 0.5% vs anterior</div></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="section-hdr"><h2>Serviços mais populares</h2></div>
+          <div class="table-wrap"><table><thead><tr><th>Serviço</th><th>Qtd</th><th>Receita</th><th>%</th></tr></thead>
+          <tbody>
+            <tr><td>Corte + Barba</td><td>72</td><td>R$ 5.760</td><td><span style="color:var(--gold)">38%</span></td></tr>
+            <tr><td>Corte de Cabelo</td><td>61</td><td>R$ 3.050</td><td><span style="color:var(--gold)">33%</span></td></tr>
+            <tr><td>Barba Completa</td><td>34</td><td>R$ 1.360</td><td><span style="color:var(--gold)">18%</span></td></tr>
+            <tr><td>Tratamento Capilar</td><td>14</td><td>R$ 980</td><td><span style="color:var(--gold)">7%</span></td></tr>
+            <tr><td>Outros</td><td>6</td><td>R$ 270</td><td><span style="color:var(--gold)">4%</span></td></tr>
+          </tbody></table></div>
+        </div>
+        <div>
+          <div class="section-hdr"><h2>Ranking de Barbeiros</h2></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px">
+              <div style="font-size:22px">🥇</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Carlos Rocha</div><div style="font-size:11px;color:var(--text2)">78 atendimentos · R$ 3.840</div></div><div style="color:var(--gold);font-size:13px;font-weight:500">★ 5.0</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px">
+              <div style="font-size:22px">🥈</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Marcos Ribeiro</div><div style="font-size:11px;color:var(--text2)">62 atendimentos · R$ 2.900</div></div><div style="color:var(--gold);font-size:13px;font-weight:500">★ 4.9</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px">
+              <div style="font-size:22px">🥉</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Felipe Gomes</div><div style="font-size:11px;color:var(--text2)">31 atendimentos · R$ 1.380</div></div><div style="color:var(--gold);font-size:13px;font-weight:500">★ 4.7</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="page" id="page-settings">
+      <div class="two-col">
+        <div>
+          <div class="section-hdr"><h2>Configurações Gerais</h2></div>
+          <div class="table-wrap" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div>
+              <label class="login-label">Nome da barbearia</label>
+              <input class="login-input" value="Barbearia Don Carlo" style="margin-bottom:0">
+            </div>
+            <div>
+              <label class="login-label">Telefone / WhatsApp</label>
+              <input class="login-input" value="(31) 3333-4444" style="margin-bottom:0">
+            </div>
+            <div>
+              <label class="login-label">Endereço</label>
+              <input class="login-input" value="Rua Dom Pedro II, 142 – Centro" style="margin-bottom:0">
+            </div>
+            <div>
+              <label class="login-label">Horário de funcionamento</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <input class="login-input" value="08:00" style="margin-bottom:0">
+                <input class="login-input" value="20:00" style="margin-bottom:0">
+              </div>
+            </div>
+            <button class="login-btn" onclick="showToast('Configurações salvas!','success')">Salvar alterações</button>
+          </div>
+        </div>
+        <div>
+          <div class="section-hdr"><h2>Alterar Senha</h2></div>
+          <div class="table-wrap" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div>
+              <label class="login-label">Senha atual</label>
+              <input class="login-input" type="password" placeholder="••••••••" style="margin-bottom:0">
+            </div>
+            <div>
+              <label class="login-label">Nova senha</label>
+              <input class="login-input" type="password" placeholder="••••••••" style="margin-bottom:0">
+            </div>
+            <div>
+              <label class="login-label">Confirmar nova senha</label>
+              <input class="login-input" type="password" placeholder="••••••••" style="margin-bottom:0">
+            </div>
+            <button class="login-btn" onclick="showToast('Senha alterada com sucesso!','success')">Alterar senha</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Agendamento</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot,
+           doc, updateDoc, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = { /* mesmo config do app cliente */ };
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // Escuta agendamentos em TEMPO REAL — atualiza a tela automaticamente
+  const q = query(collection(db, "agendamentos"), orderBy("criadoEm", "desc"));
+
+  onSnapshot(q, (snapshot) => {
+    APPOINTMENTS = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    renderAppts();     // Atualiza a tabela
+    renderDashboard(); // Atualiza os cards
+    console.log("🔥 Dados atualizados:", APPOINTMENTS.length, "agendamentos");
+  });
+
+  // Função para confirmar ou cancelar um agendamento
+  window.atualizarStatus = async (id, novoStatus) => {
+    await updateDoc(doc(db, "agendamentos", id), {
+      status: novoStatus
+    });
+  };
+</script>
+
+<script>
+// ── CREDENTIALS ──────────────────────────────────────────────────────────────
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'carlo2024';
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const BARBERS_DATA = [
+  { id:0, name:'Carlos Rocha',  role:'Fundador',    color:'#C9A84C', initials:'CR', rating:5.0, appts:78, available:true },
+  { id:1, name:'Marcos Ribeiro',role:'Especialista',color:'#7B5EA7', initials:'MR', rating:4.9, appts:62, available:true },
+  { id:2, name:'Felipe Gomes',  role:'Barbeiro',    color:'#4A8FA0', initials:'FG', rating:4.7, appts:31, available:true },
+  { id:3, name:'Rafael Lima',   role:'Trainee',     color:'#5A8050', initials:'RL', rating:4.5, appts:16, available:false }
+];
+const SERVICES_DATA = [
+  { id:0, name:'Corte de Cabelo',     duration:30, price:50,  icon:'✂️',  count:61 },
+  { id:1, name:'Barba Completa',      duration:25, price:40,  icon:'🪒',  count:34 },
+  { id:2, name:'Corte + Barba',       duration:50, price:80,  icon:'💈',  count:72 },
+  { id:3, name:'Tratamento Capilar',  duration:40, price:70,  icon:'💆',  count:14 },
+  { id:4, name:'Corte Infantil',      duration:25, price:35,  icon:'👶',  count:5  },
+  { id:5, name:'Bigode e Sobrancelha',duration:15, price:25,  icon:'🧔',  count:6  }
+];
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const now = new Date();
+
+// Base appointments
+let APPOINTMENTS = [
+  { id:1, client:'João Silva',    phone:'(31) 99876-5432', barber:0, service:'Corte + Barba',       date:'2026-04-02', time:'08:00', price:80,  status:'confirmed', code:'DC1A2B' },
+  { id:2, client:'Pedro Alves',   phone:'(31) 98765-4321', barber:1, service:'Corte de Cabelo',     date:'2026-04-02', time:'09:00', price:50,  status:'confirmed', code:'DC3C4D' },
+  { id:3, client:'Lucas Costa',   phone:'(31) 97654-3210', barber:0, service:'Barba Completa',      date:'2026-04-02', time:'11:00', price:40,  status:'pending',   code:'DC5E6F' },
+  { id:4, client:'Bruno Martins', phone:'(31) 96543-2109', barber:2, service:'Tratamento Capilar',  date:'2026-04-02', time:'13:00', price:70,  status:'confirmed', code:'DC7G8H' },
+  { id:5, client:'Ricardo Lima',  phone:'(31) 95432-1098', barber:1, service:'Corte + Barba',       date:'2026-04-02', time:'14:00', price:80,  status:'pending',   code:'DC9I0J' },
+  { id:6, client:'André Santos',  phone:'(31) 94321-0987', barber:3, service:'Corte de Cabelo',     date:'2026-04-02', time:'15:00', price:50,  status:'pending',   code:'DCKL12' },
+  { id:7, client:'Thiago Nunes',  phone:'(31) 93210-9876', barber:2, service:'Corte Infantil',      date:'2026-04-02', time:'16:00', price:35,  status:'confirmed', code:'DCMN34' },
+  { id:8, client:'Fernando Reis', phone:'(31) 92109-8765', barber:0, service:'Corte + Barba',       date:'2026-04-02', time:'17:00', price:80,  status:'confirmed', code:'DCOP56' },
+  { id:9, client:'Gustavo Pinto', phone:'(31) 99111-2233', barber:1, service:'Barba Completa',      date:'2026-04-03', time:'09:00', price:40,  status:'confirmed', code:'DCQR78' },
+  { id:10,client:'Daniel Souza',  phone:'(31) 98222-3344', barber:0, service:'Tratamento Capilar',  date:'2026-04-03', time:'11:00', price:70,  status:'confirmed', code:'DCST90' },
+  { id:11,client:'Mateus Carvalho',phone:'(31) 97333-4455',barber:2, service:'Corte de Cabelo',     date:'2026-04-04', time:'10:00', price:50,  status:'pending',   code:'DCUV12' },
+  { id:12,client:'Rodrigo Faria', phone:'(31) 96444-5566', barber:1, service:'Corte + Barba',       date:'2026-04-05', time:'14:00', price:80,  status:'confirmed', code:'DCWX34' },
+];
+let nextId = 13;
+let apptFilter = 'all';
+let apptSearch = '';
+let miniCalMonth = now.getMonth();
+let miniCalYear  = now.getFullYear();
+let bigCalMonth  = now.getMonth();
+let bigCalYear   = now.getFullYear();
+let selectedDay  = null;
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  } else {
+    err.style.display='block';
+    document.getElementById('login-pass').value='';
+    setTimeout(()=>err.style.display='none',3000);
+  }
+}
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+function logout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('login-pass').value='';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function initApp(){
+  // Topbar date
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('chart-range').textContent = 'Últimos 7 dias';
+  renderDashboard();
+  renderAppts();
+  renderBarbers();
+  renderServices();
+  renderMiniCal();
+  renderBigCal();
+}
+
+// ── PAGE NAV ──────────────────────────────────────────────────────────────────
+const PAGE_TITLES = {
+  dashboard:'Dashboard',appointments:'Agendamentos',calendar:'Agenda do Calendário',
+  barbers:'Equipe de Barbeiros',services:'Serviços',reports:'Relatórios',settings:'Configurações'
+};
+function goPage(name, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[name]||name;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const today = fmtDate(now);
+  const todayAppts = APPOINTMENTS.filter(a=>a.date===today);
+  const pending = APPOINTMENTS.filter(a=>a.status==='pending').length;
+
+  document.getElementById('m-today').textContent = todayAppts.length;
+  document.getElementById('m-revenue').textContent = 'R$ '+todayAppts.filter(a=>a.status==='confirmed').reduce((s,a)=>s+a.price,0);
+  document.getElementById('m-pending').textContent = pending;
+  document.getElementById('pending-badge').textContent = pending;
+
+  // Chart
+  const bars = document.getElementById('chart-bars');
+  const days=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const vals=[4,6,5,8,7,9,8];
+  const maxV=Math.max(...vals);
+  bars.innerHTML=vals.map((v,i)=>`
+    <div class="bar-col">
+      <div class="bar-val">${v}</div>
+      <div class="bar" style="height:${Math.round(v/maxV*100)}%" title="${v} agendamentos"></div>
+      <div class="bar-label">${days[(now.getDay()-6+i+7)%7]}</div>
+    </div>`).join('');
+
+  // Schedule
+  const sch = document.getElementById('today-schedule');
+  if(todayAppts.length===0){
+    sch.innerHTML='<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">Nenhum agendamento hoje</div></div>';
+    return;
+  }
+  sch.innerHTML=todayAppts.sort((a,b)=>a.time.localeCompare(b.time)).map(a=>`
+    <div class="schedule-item ${a.status}-item" onclick="openApptModal(${a.id})">
+      <div class="sch-time">${a.time}</div>
+      <div class="sch-info">
+        <div class="sch-client">${a.client}</div>
+        <div class="sch-service">${a.service}</div>
+        <div class="sch-barber">${BARBERS_DATA[a.barber].name}</div>
+      </div>
+      <div>${badgeHTML(a.status)}</div>
+    </div>`).join('');
+
+  // Barbers today
+  const bt = document.getElementById('barbers-today');
+  bt.innerHTML=BARBERS_DATA.map(b=>{
+    const cnt=todayAppts.filter(a=>a.barber===b.id&&a.status!=='cancelled').length;
+    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;border-radius:50%;background:${b.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0d0d0d">${b.initials}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${b.name}</div></div>
+      <div style="font-size:12px;color:var(--text2)">${cnt} agendamento${cnt!==1?'s':''}</div>
+      <div style="width:8px;height:8px;border-radius:50%;background:${b.available?'var(--green)':'var(--text3)'}"></div>
+    </div>`;
+  }).join('');
+}
+
+// ── MINI CALENDAR ─────────────────────────────────────────────────────────────
+function renderMiniCal(){
+  document.getElementById('mini-month-label').textContent=MONTHS[miniCalMonth].substring(0,3)+' '+miniCalYear;
+  const firstDay=new Date(miniCalYear,miniCalMonth,1).getDay();
+  const daysInMonth=new Date(miniCalYear,miniCalMonth+1,0).getDate();
+  const apptDays=new Set(APPOINTMENTS.filter(a=>{
+    const d=new Date(a.date+'T00:00:00');
+    return d.getMonth()===miniCalMonth&&d.getFullYear()===miniCalYear&&a.status!=='cancelled';
+  }).map(a=>parseInt(a.date.split('-')[2])));
+  let html='';
+  for(let i=0;i<firstDay;i++)html+='<div class="mini-day empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const cellDate=new Date(miniCalYear,miniCalMonth,d);
+    const isPast=cellDate<new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    const isToday=d===now.getDate()&&miniCalMonth===now.getMonth()&&miniCalYear===now.getFullYear();
+    const isSel=selectedDay===`${miniCalYear}-${String(miniCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let cls='mini-day';
+    if(isPast)cls+=' past';
+    if(isToday)cls+=' today';
+    if(apptDays.has(d))cls+=' has-appt';
+    if(isSel)cls+=' selected';
+    html+=`<div class="${cls}" onclick="miniSelectDay(${miniCalYear},${miniCalMonth},${d})">${d}</div>`;
+  }
+  document.getElementById('mini-grid').innerHTML=html;
+}
+function miniMonth(dir){
+  miniCalMonth+=dir;
+  if(miniCalMonth>11){miniCalMonth=0;miniCalYear++}
+  if(miniCalMonth<0){miniCalMonth=11;miniCalYear--}
+  renderMiniCal();
+}
+function miniSelectDay(y,m,d){
+  selectedDay=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  renderMiniCal();
+}
+
+// ── BIG CALENDAR ─────────────────────────────────────────────────────────────
+function renderBigCal(){
+  document.getElementById('cal-month-title').textContent=MONTHS[bigCalMonth]+' '+bigCalYear;
+  const firstDay=new Date(bigCalYear,bigCalMonth,1).getDay();
+  const daysInMonth=new Date(bigCalYear,bigCalMonth+1,0).getDate();
+  let html='';
+  for(let i=0;i<firstDay;i++)html+=`<div style="min-height:60px;border-radius:8px;background:transparent"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${bigCalYear}-${String(bigCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayAppts=APPOINTMENTS.filter(a=>a.date===dateStr&&a.status!=='cancelled');
+    const isToday=d===now.getDate()&&bigCalMonth===now.getMonth()&&bigCalYear===now.getFullYear();
+    const isWknd=new Date(bigCalYear,bigCalMonth,d).getDay()===0||new Date(bigCalYear,bigCalMonth,d).getDay()===6;
+    html+=`<div style="min-height:60px;border:1px solid var(--border);border-radius:8px;padding:6px;cursor:pointer;transition:.15s;background:${isToday?'rgba(201,168,76,.08)':isWknd?'rgba(255,255,255,.01)':'transparent'};border-color:${isToday?'rgba(201,168,76,.4)':'var(--border)'}" onclick="calSelectDay(${bigCalYear},${bigCalMonth},${d})" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='${isToday?'rgba(201,168,76,.4)':'var(--border)'}'">
+      <div style="font-size:12px;font-weight:${isToday?700:400};color:${isToday?'var(--gold)':'var(--text2)'};margin-bottom:4px">${d}</div>
+      ${dayAppts.slice(0,2).map(a=>`<div style="font-size:10px;background:var(--gold-pale);border-radius:4px;padding:2px 5px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--gold-l)">${a.time} ${a.client.split(' ')[0]}</div>`).join('')}
+      ${dayAppts.length>2?`<div style="font-size:10px;color:var(--text3)">+${dayAppts.length-2} mais</div>`:''}
+    </div>`;
+  }
+  document.getElementById('cal-big-grid').innerHTML=html;
+}
+function calMonth(dir){
+  bigCalMonth+=dir;
+  if(bigCalMonth>11){bigCalMonth=0;bigCalYear++}
+  if(bigCalMonth<0){bigCalMonth=11;bigCalYear--}
+  renderBigCal();
+}
+function calSelectDay(y,m,d){
+  const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const dateFormatted=new Date(dateStr+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('cal-day-title').textContent=dateFormatted;
+  const dayAppts=APPOINTMENTS.filter(a=>a.date===dateStr).sort((a,b)=>a.time.localeCompare(b.time));
+  const list=document.getElementById('cal-day-list');
+  if(dayAppts.length===0){
+    list.innerHTML='<div class="empty-state"><div class="empty-state-icon">🕐</div><div class="empty-state-text">Nenhum agendamento neste dia</div></div>';
+    return;
+  }
+  list.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+dayAppts.map(a=>`
+    <div class="schedule-item ${a.status}-item" onclick="openApptModal(${a.id})">
+      <div class="sch-time">${a.time}</div>
+      <div class="sch-info">
+        <div class="sch-client">${a.client}</div>
+        <div class="sch-service">${a.service}</div>
+        <div class="sch-barber">${BARBERS_DATA[a.barber].name}</div>
+      </div>
+      <div>${badgeHTML(a.status)}</div>
+    </div>`).join('')+'</div>';
+}
+
+// ── APPOINTMENTS TABLE ────────────────────────────────────────────────────────
+function renderAppts(){
+  let list=APPOINTMENTS;
+  if(apptFilter!=='all') list=list.filter(a=>a.status===apptFilter);
+  if(apptSearch) list=list.filter(a=>a.client.toLowerCase().includes(apptSearch.toLowerCase())||a.service.toLowerCase().includes(apptSearch.toLowerCase()));
+  list=[...list].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const tbody=document.getElementById('appts-tbody');
+  if(list.length===0){
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">Nenhum agendamento encontrado</td></tr>';
+    document.getElementById('appt-count').textContent='';
+    return;
+  }
+  tbody.innerHTML=list.map(a=>`
+    <tr onclick="openApptModal(${a.id})">
+      <td><div style="font-weight:500">${a.client}</div><div style="font-size:11px;color:var(--text3)">${a.phone}</div></td>
+      <td>${a.service}</td>
+      <td>${BARBERS_DATA[a.barber].name}</td>
+      <td>${fmtDatePT(a.date)}</td>
+      <td><span style="color:var(--gold);font-weight:500">${a.time}</span></td>
+      <td style="color:var(--gold)">R$ ${a.price}</td>
+      <td>${badgeHTML(a.status)}</td>
+      <td onclick="event.stopPropagation()">
+        <div style="display:flex;gap:4px">
+          ${a.status==='pending'?`<button class="action-btn confirm" onclick="changeStatus(${a.id},'confirmed')" title="Confirmar">✓</button>`:''}
+          ${a.status!=='cancelled'?`<button class="action-btn cancel" onclick="changeStatus(${a.id},'cancelled')" title="Cancelar">✕</button>`:''}
+          <button class="action-btn view" onclick="openApptModal(${a.id})" title="Ver detalhes">👁</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('appt-count').textContent=`Mostrando ${list.length} de ${APPOINTMENTS.length} agendamentos`;
+}
+function filterStatus(s,el){
+  apptFilter=s;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderAppts();
+}
+function filterAppts(v){ apptSearch=v; renderAppts(); }
+function changeStatus(id,status){
+  const a=APPOINTMENTS.find(x=>x.id===id);
+  if(!a)return;
+  a.status=status;
+  renderAppts();
+  renderDashboard();
+  const pending=APPOINTMENTS.filter(a=>a.status==='pending').length;
+  document.getElementById('pending-badge').textContent=pending;
+  document.getElementById('m-pending').textContent=pending;
+  showToast(status==='confirmed'?'✓ Agendamento confirmado!':'✕ Agendamento cancelado.', status==='confirmed'?'success':'error');
+  closeModal();
+}
+
+// ── BARBERS PAGE ──────────────────────────────────────────────────────────────
+function renderBarbers(){
+  document.getElementById('barbers-grid').innerHTML=BARBERS_DATA.map(b=>`
+    <div class="barber-admin-card">
+      <div class="ba-avatar" style="background:${b.color}">${b.initials}</div>
+      <div class="ba-name">${b.name}</div>
+      <div class="ba-role"><span class="ba-status-dot" style="background:${b.available?'var(--green)':'var(--text3)'}"></span>${b.role}</div>
+      <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:2px">
+        <span class="badge ${b.available?'badge-confirmed':'badge-cancelled'}">${b.available?'Disponível':'Folga'}</span>
+        <span class="badge badge-pending">★ ${b.rating}</span>
+      </div>
+      <div class="ba-stats">
+        <div class="ba-stat"><div class="ba-stat-num">${b.appts}</div><div class="ba-stat-lbl">Cortes/mês</div></div>
+        <div class="ba-stat"><div class="ba-stat-num" style="font-size:13px">R$${(b.appts*58).toLocaleString('pt-BR')}</div><div class="ba-stat-lbl">Faturamento</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ── SERVICES PAGE ─────────────────────────────────────────────────────────────
+function renderServices(){
+  document.getElementById('services-tbody').innerHTML=SERVICES_DATA.map(s=>`
+    <tr>
+      <td><span style="margin-right:8px">${s.icon}</span>${s.name}</td>
+      <td>${s.duration} min</td>
+      <td style="color:var(--gold);font-weight:500">R$ ${s.price}</td>
+      <td>${s.count} este mês</td>
+      <td><span class="badge badge-confirmed">Ativo</span></td>
+      <td><div style="display:flex;gap:4px">
+        <button class="action-btn view" title="Editar">✏️</button>
+        <button class="action-btn cancel" title="Desativar">✕</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openApptModal(id){
+  const a=APPOINTMENTS.find(x=>x.id===id);
+  if(!a)return;
+  document.getElementById('modal-title').textContent='Detalhes do Agendamento';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-detail-row"><div class="modal-detail-label">🆔 Código</div><div class="modal-detail-value" style="font-family:monospace;color:var(--gold);font-size:15px;letter-spacing:2px">${a.code}</div></div>
+    <div class="modal-detail-row"><div class="modal-detail-label">👤 Cliente</div><div class="modal-detail-value"><div>${a.client}</div><div style="font-size:11px;color:var(--text2)">${a.phone}</div></div></div>
+    <div class="modal-detail-row"><div class="modal-detail-label">✂️ Serviço</div><div class="modal-detail-value">${a.service}</div></div>
+    <div class="modal-detail-row"><div class="modal-detail-label">💇 Barbeiro</div><div class="modal-detail-value">${BARBERS_DATA[a.barber].name}</div></div>
+    <div class="modal-detail-row"><div class="modal-detail-label">📅 Data</div><div class="modal-detail-value">${fmtDatePT(a.date)}</div></div>
+    <div class="modal-detail-row"><div class="modal-detail-label">⏰ Horário</div><div class="modal-detail-value" style="color:var(--gold)">${a.time}</div></div>
+    <div class="modal-detail-row"><div class="modal-detail-label">💰 Valor</div><div class="modal-detail-value" style="color:var(--gold);font-size:15px;font-weight:500">R$ ${a.price}</div></div>
+    <div class="modal-detail-row" style="border-bottom:none"><div class="modal-detail-label">📊 Status</div><div class="modal-detail-value">${badgeHTML(a.status)}</div></div>
+    <div class="modal-actions">
+      ${a.status==='pending'?`<button class="modal-btn modal-btn-confirm" onclick="changeStatus(${a.id},'confirmed')">✓ Confirmar</button>`:''}
+      ${a.status!=='cancelled'?`<button class="modal-btn modal-btn-cancel" onclick="changeStatus(${a.id},'cancelled')">✕ Cancelar</button>`:''}
+      <button class="modal-btn modal-btn-close" onclick="closeModal()">Fechar</button>
+    </div>`;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openNewAppt(){
+  document.getElementById('modal-title').textContent='Novo Agendamento';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div><label class="login-label">Nome do cliente</label><input class="login-input" id="na-client" placeholder="Nome completo" style="margin-bottom:0"></div>
+      <div><label class="login-label">Telefone</label><input class="login-input" id="na-phone" placeholder="(31) 9 9999-9999" style="margin-bottom:0"></div>
+      <div><label class="login-label">Barbeiro</label>
+        <select class="login-input" id="na-barber" style="margin-bottom:0">
+          ${BARBERS_DATA.map((b,i)=>`<option value="${i}">${b.name}</option>`).join('')}
+        </select>
+      </div>
+      <div><label class="login-label">Serviço</label>
+        <select class="login-input" id="na-service" style="margin-bottom:0">
+          ${SERVICES_DATA.map(s=>`<option value="${s.id}">${s.name} — R$ ${s.price}</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="login-label">Data</label><input class="login-input" id="na-date" type="date" style="margin-bottom:0" value="${fmtDate(now)}"></div>
+        <div><label class="login-label">Horário</label>
+          <select class="login-input" id="na-time" style="margin-bottom:0">
+            ${['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'].map(t=>`<option>${t}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-confirm" onclick="saveNewAppt()">✓ Salvar Agendamento</button>
+      <button class="modal-btn modal-btn-close" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function saveNewAppt(){
+  const client=document.getElementById('na-client').value.trim();
+  const phone=document.getElementById('na-phone').value.trim();
+  const barber=parseInt(document.getElementById('na-barber').value);
+  const svcId=parseInt(document.getElementById('na-service').value);
+  const date=document.getElementById('na-date').value;
+  const time=document.getElementById('na-time').value;
+  if(!client){showToast('Informe o nome do cliente','error');return}
+  const svc=SERVICES_DATA[svcId];
+  const code='DC'+Math.random().toString(36).substr(2,6).toUpperCase();
+  APPOINTMENTS.push({id:nextId++,client,phone:phone||'—',barber,service:svc.name,date,time,price:svc.price,status:'confirmed',code});
+  renderAppts(); renderDashboard(); renderMiniCal(); renderBigCal();
+  document.getElementById('pending-badge').textContent=APPOINTMENTS.filter(a=>a.status==='pending').length;
+  closeModal();
+  showToast('✓ Agendamento criado com sucesso!','success');
+}
+
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function badgeHTML(status){
+  const map={confirmed:['badge-confirmed','● Confirmado'],pending:['badge-pending','● Pendente'],cancelled:['badge-cancelled','● Cancelado']};
+  const [cls,label]=map[status]||['badge-pending','● Desconhecido'];
+  return`<span class="badge ${cls}">${label}</span>`;
+}
+function fmtDate(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function fmtDatePT(str){
+  const d=new Date(str+'T00:00:00');
+  return d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(type?' '+type:'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
